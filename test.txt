@@ -1,0 +1,3 @@
+clef-C3
+keySignature-A
+timeSignature-8/4
