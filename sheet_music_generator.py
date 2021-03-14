@@ -28,7 +28,6 @@ octave_ranges = {
     'mezzosoprano' : (3, 4, 5),
     'alto'         : (3, 4, 5),
     'tenor'        : (3, 4, 5),
-    'tenor'        : (2, 3, 4),
     'baritone'     : (3, 4),
     'bass'         : (2, 3, 4),
     'subbass'      : (2, 3, 4)
@@ -104,7 +103,8 @@ def generate_line(output_name, num_bars):
             in_slur = False
             for bar in range(num_bars):
                 remaining_time = (1 / value_per_beat) * beats_per_bar
-                while remaining_time >= 0:
+                while remaining_time > 0:
+                    print('Remaining:', remaining_time)
                     note_lp = ''
                     note_semantic = 'note-'
 
@@ -127,15 +127,15 @@ def generate_line(output_name, num_bars):
                     note_semantic += note_pitch.upper() + accidental_semantic + str(octave)
 
                     # Determines time value of note
-                    shortest_note_index = len(note_durations)
+                    note_durations_length = len(note_durations)
                     longest_note_index = 0
-                    for i in range(longest_note_index):
-                        if 1/note_durations[i] <= remaining_time:
+                    for i in range(note_durations_length):
+                        if 1 / note_durations[i] <= remaining_time:
                             longest_note_index = i
                             break
-                        if i == shortest_note_index:
-                            raise Exception("Not enough space in bar")
-                    note_index = random.choice(range(longest_note_index, shortest_note_index))
+                        if i == note_durations_length - 1:
+                            raise Exception('Not enough space in bar; space remaining: ' + str(remaining_time))
+                    note_index = random.choice(range(longest_note_index, note_durations_length))
                     note_duration = 1 / note_durations[note_index]
 
                     # Adds time value to strings
@@ -143,7 +143,7 @@ def generate_line(output_name, num_bars):
                     note_semantic += '_' + str(note_durations_semantic[note_index])
 
                     # Determines if note is dotted & adds to strings
-                    if note_index != shortest_note_index and note_duration * 1.5 <= remaining_time and random.uniform(0,1) < DOTTED_NOTE_CHANCE:
+                    if note_index != note_durations_length - 1 and note_duration * 1.5 <= remaining_time and random.uniform(0,1) < DOTTED_NOTE_CHANCE:
                         note_duration *= 1.5
                         note_lp += '.'
                         note_semantic += '.'
