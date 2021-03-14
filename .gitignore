@@ -1,4 +1,3 @@
 .DS_Store
 
-test.ly
-test.txt
+test_output*

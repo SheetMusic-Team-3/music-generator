@@ -1,6 +1,5 @@
 import random
 
-
 # LILYPOND_VERSION = '2.20.0'
 LILYPOND_VERSION = '2.18.2'
 LILYPOND_ENDING = '\\layout{}\n\\midi{}'
@@ -15,12 +14,23 @@ STOP_SLUR_CHANCE = .50
 
 clefs = ('treble', 'soprano', 'mezzosoprano', 'alto', 'tenor', 'baritone', 'bass', 'subbass')
 
+clef_to_semantic = {
+    'treble'       : 'G2',
+    'soprano'      : 'C1',
+    'mezzosoprano' : 'C2',
+    'alto'         : 'C3',
+    'tenor'        : 'C4',
+    'baritone'     : 'C5',
+    'bass'         : 'F4',
+    'subbass'      : 'F5'
+}
+
+keys = ('C', 'G', 'D', 'A', 'E', 'B', 'Cb', 'F#', 'Gb', 'Db', 'C#', 'Ab', 'Eb', 'Bb', 'F')
+
 notes = ('a', 'b', 'c', 'd', 'e', 'f', 'g')
 
 note_durations = (1, 2, 4, 8, 16, 32)
 note_durations_semantic = ('whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty_second')
-
-keys = ('C', 'G', 'D', 'A', 'E', 'B', 'Cb', 'F#', 'Gb', 'Db', 'C#', 'Ab', 'Eb', 'Bb', 'F')
 
 octave_ranges = {
     'treble'       : (4, 5, 6),
@@ -42,22 +52,12 @@ octave_to_lp = {
     6 : '\'\'\''
 }
 
-clef_to_semantic = {
-    'treble'       : 'G2',
-    'soprano'      : 'C1',
-    'mezzosoprano' : 'C2',
-    'alto'         : 'C3',
-    'tenor'        : 'C4',
-    'baritone'     : 'C5',
-    'bass'         : 'F4',
-    'subbass'      : 'F5'
-}
 
-def generate_line(output_name, num_bars):
+def generate_line(output_name = 'test_output', num_bars = 4):
     """Generates a random line of sheet music in LilyPond and semantic notation formats
        
-       output_name: a string that the export files will be saved to
-       num_bars: an integer that dictates how many bars of music will be generated
+       output_name: a string that is the base filename exports will be saved as; default value is test_output
+       num_bars: an integer that dictates how many bars of music will be generated; default value is 4
     """
 
     # Picks a random clef
@@ -104,7 +104,6 @@ def generate_line(output_name, num_bars):
             for bar in range(num_bars):
                 remaining_time = (1 / value_per_beat) * beats_per_bar
                 while remaining_time > 0:
-                    print('Remaining:', remaining_time)
                     note_lp = ''
                     note_semantic = 'note-'
 
@@ -180,17 +179,17 @@ def generate_line(output_name, num_bars):
 
 
 
-def multi_generate(num_lines, output_name, num_bars):
+def multi_generate(num_lines = 1, output_name = 'test_output_', num_bars = 4):
     """Generates multiple random line of sheet music in LilyPond and semantic notation formats
        Calls generate_line() for each line to generate; each iteration generates 2 files 
        
-       num_lines: an integer that dictates how many random lines will be generated
-       output_name: a string that the export files will be saved to
-       num_bars: an integer that dictates how many bars of music will be generated
+       num_lines: an integer that dictates how many random lines will be generated; default value is 1
+       output_name: a string that is the base filename exports will be saved as; default value is test_output_
+       num_bars: an integer that dictates how many bars of music will be generated; default value is 4
     """
 
     for i in range(num_lines):
         generate_line(output_name + str(i + 1), num_bars)
 
-generate_line('test', 4)
-#multi_generate(4, 'test', 4)
+# Testing function
+multi_generate(num_lines = 4)
