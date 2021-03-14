@@ -1,3 +1,10 @@
-clef-C3
-keySignature-A
-timeSignature-8/4
+clef-G2
+keySignature-G
+timeSignature-4/4
+note-B5_eighth
+note-E4_sixteenth.
+note-A6_thirty_second.
+note-A4_eighth
+note-A5_sixteenth
+note-A5_whole
+barline
