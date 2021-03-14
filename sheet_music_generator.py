@@ -1,8 +1,14 @@
 import random
 
-LILYPOND_VERSION = '2.20.0'
+
+# LILYPOND_VERSION = '2.20.0'
+LILYPOND_VERSION = '2.18.2'
+LILYPOND_ENDING = '\\layout{}\n\\midi{}'
+
 COMMON_TIME_CHANCE = .50
 CUT_TIME_CHANCE = .50
+SHARP_CHANCE = .25
+FLAT_CHANCE = .25
 DOTTED_NOTE_CHANCE = .25
 
 clefs = ('treble', 'soprano', 'mezzosoprano', 'alto', 'tenor', 'baritone', 'bass', 'subbass')
@@ -21,7 +27,7 @@ octave_ranges = {
     'alto'         : (3, 4, 5),
     'tenor'        : (3, 4, 5),
     'tenor'        : (2, 3, 4),
-    'baritone'     : (2, 3, 4),
+    'baritone'     : (3, 4),
     'bass'         : (2, 3, 4),
     'subbass'      : (2, 3, 4)
 }
@@ -103,8 +109,19 @@ def generate_line(output_name, num_bars):
                     note_pitch = random.choice(notes)
                     octave = random.choice(octave_ranges[clef])
 
-                    note_lp += note_pitch + octave_to_lp[octave]
-                    note_semantic += note_pitch.upper() + str(octave)
+                    # Adjusts note to be sharp or flat
+                    accidental_lp = ''
+                    accidental_semantic = ''
+                    if random.uniform(0,1) < SHARP_CHANCE:
+                        accidental_lp = 'is'
+                        accidental_semantic = '#'
+                    if random.uniform(0,1) < FLAT_CHANCE:
+                        accidental_lp = 'es'
+                        accidental_semantic = 'b'
+
+                    # Adds pitch to strings
+                    note_lp += note_pitch + accidental_lp + octave_to_lp[octave]
+                    note_semantic += note_pitch.upper() + accidental_semantic + str(octave)
 
                     # Determines time value of note
                     shortest_note_index = len(note_durations)
@@ -117,10 +134,12 @@ def generate_line(output_name, num_bars):
                             raise Exception("Not enough space in bar")
                     note_index = random.choice(range(longest_note_index, shortest_note_index))
                     note_duration = 1 / note_durations[note_index]
+
+                    # Adds time value to strings
                     note_lp += str(note_durations[note_index])
                     note_semantic += '_' + str(note_durations_semantic[note_index])
 
-                    # Determines if note is dotted
+                    # Determines if note is dotted & adds to strings
                     if note_index != shortest_note_index and note_duration * 1.5 <= remaining_time and random.uniform(0,1) < DOTTED_NOTE_CHANCE:
                         note_duration *= 1.5
                         note_lp += '.'
@@ -133,10 +152,11 @@ def generate_line(output_name, num_bars):
                     # Adjusts loop variable
                     remaining_time -= note_duration
                 
+                # Writes barline
                 semantic_file.write('barline\n')
             
             # Finishes LilyPond file
-            lilypond_file.write('\n}}')
+            lilypond_file.write('\\bar "|."\n}\n' + LILYPOND_ENDING + '}')
 
 
 
@@ -152,5 +172,5 @@ def multi_generate(num_lines, output_name, num_bars):
     for i in range(num_lines):
         generate_line(output_name + str(i + 1), num_bars)
 
-generate_line('test', 1)
+generate_line('test', 4)
 #multi_generate(4, 'test', 4)
