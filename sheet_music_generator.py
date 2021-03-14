@@ -10,6 +10,8 @@ CUT_TIME_CHANCE = .50
 SHARP_CHANCE = .25
 FLAT_CHANCE = .25
 DOTTED_NOTE_CHANCE = .25
+START_SLUR_CHANCE = .10
+STOP_SLUR_CHANCE = .50
 
 clefs = ('treble', 'soprano', 'mezzosoprano', 'alto', 'tenor', 'baritone', 'bass', 'subbass')
 
@@ -99,6 +101,7 @@ def generate_line(output_name, num_bars):
             semantic_file.write('timeSignature-' + time_semantic + '\n')
 
             # Writes notes by bar; currently, a note cannot span across a barline
+            in_slur = False
             for bar in range(num_bars):
                 remaining_time = (1 / value_per_beat) * beats_per_bar
                 while remaining_time >= 0:
@@ -127,10 +130,10 @@ def generate_line(output_name, num_bars):
                     shortest_note_index = len(note_durations)
                     longest_note_index = 0
                     for i in range(longest_note_index):
-                        if 1/i <= remaining_time:
+                        if 1/note_durations[i] <= remaining_time:
                             longest_note_index = i
                             break
-                        if i == len(shortest_note_index):
+                        if i == shortest_note_index:
                             raise Exception("Not enough space in bar")
                     note_index = random.choice(range(longest_note_index, shortest_note_index))
                     note_duration = 1 / note_durations[note_index]
@@ -144,6 +147,23 @@ def generate_line(output_name, num_bars):
                         note_duration *= 1.5
                         note_lp += '.'
                         note_semantic += '.'
+
+                    # Determines whether to start/continue a slur; will end any slurs on the first note of the final bar
+                    if bar == num_bars:
+                        if in_slur:
+                            in_slur = False
+                            note_lp += ')'
+                    elif in_slur:
+                        if random.uniform(0,1) < STOP_SLUR_CHANCE:
+                            in_slur = False
+                            note_lp += ')'
+                        else:
+                            note_semantic += '\ntie'
+                    else:
+                        if random.uniform(0,1) < START_SLUR_CHANCE:
+                            in_slur = True
+                            note_lp += '('
+                            note_semantic += '\ntie'
                     
                     # Writes strings to files
                     lilypond_file.write(note_lp + ' ')
