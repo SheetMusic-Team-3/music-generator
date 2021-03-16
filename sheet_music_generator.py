@@ -117,7 +117,7 @@ def generate_line(output_name = 'test_output', num_bars = 4):
                     if random.uniform(0,1) < SHARP_CHANCE:
                         accidental_lp = 'is'
                         accidental_semantic = '#'
-                    if random.uniform(0,1) < FLAT_CHANCE:
+                    elif random.uniform(0,1) < FLAT_CHANCE:
                         accidental_lp = 'es'
                         accidental_semantic = 'b'
 
@@ -178,7 +178,6 @@ def generate_line(output_name = 'test_output', num_bars = 4):
             lilypond_file.write('\\bar "|."\n}\n' + LILYPOND_ENDING + '}')
 
 
-
 def multi_generate(num_lines = 1, output_name = 'test_output_', num_bars = 4):
     """Generates multiple random line of sheet music in LilyPond and semantic notation formats
        Calls generate_line() for each line to generate; each iteration generates 2 files 
@@ -191,5 +190,7 @@ def multi_generate(num_lines = 1, output_name = 'test_output_', num_bars = 4):
     for i in range(num_lines):
         generate_line(output_name + str(i + 1), num_bars)
 
-# Testing function
-multi_generate(num_lines = 4)
+
+# Testing functions
+#multi_generate(num_lines = 4)
+#multi_generate(num_lines = 1, num_bars = 40)
